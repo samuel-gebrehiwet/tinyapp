@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/samuel-gebrehiwet/tinyapp/issues"
   },
-  "homepage": "https://github.com/samuel-gebrehiwet/tinyapp#readme"
+  "homepage": "https://github.com/samuel-gebrehiwet/tinyapp#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
 }
