@@ -31,9 +31,21 @@ app.get("/urls", (req, res) => {
 });
 
 
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+
 app.get("/urls/:id", (req, res) => {
   const id = req.params.id;
   const longURL = urlDatabase[id];
   const templateVars = { id, longURL };
   res.render("urls_show", templateVars);
+});
+
+app.use(express.urlencoded({ extended: true }));
+
+app.post("/urls", (req, res) => {
+  console.log(req.body); // Log the POST request body to the console
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
