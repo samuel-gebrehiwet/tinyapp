@@ -24,6 +24,7 @@
           <tr>
             <th scope="col">Short URL ID</th>
             <th scope="col">Long URL</th>
+            <th scope="col">Action</th> <!-- Added a header for Action -->
           </tr>
         </thead>
         <tbody>
@@ -31,6 +32,11 @@
             <tr>
               <td><%= id %></td>
               <td><%= urls[id] %></td>
+              <td> <!-- Added a table cell for the form -->
+                <form method="POST" action="/urls/<%= id %>/delete">
+                  <button type="submit">Delete</button>
+                </form>
+              </td>
             </tr>
           <% } %>
         </tbody>
@@ -54,3 +60,4 @@
     ></script>
   </body>
 </html>
+
