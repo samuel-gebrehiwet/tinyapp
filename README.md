@@ -1,4 +1,4 @@
-# media-typer
+# TinyAPP project
 
 [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
