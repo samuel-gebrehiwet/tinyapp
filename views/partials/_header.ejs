@@ -16,6 +16,18 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        
+        <!-- Check if username cookie exists -->
+        <% if (username) { %>
+          <span class="nav-item nav-link">Logged in as: <%= username %></span>
+        <% } else { %>
+          <!-- Display login form if no username cookie -->
+          <form method="POST" action="/login" class="nav-item nav-link">
+            <input type="text" name="username" placeholder="Enter your username" />
+            <button type="submit">Login</button>
+          </form>
+        <% } %>
+        
       </div>
     </div>
   </nav>

@@ -73,4 +73,10 @@ app.get("/urls/:id/edit", (req, res) => {
   const templateVars = { id, longURL };
   res.render("urls_edit", templateVars);
 });
+  
+app.post("/login", (req, res) => {
+  const username = req.body.username;
+  res.cookie("username", username);
+  res.redirect("/urls");
+});
 
