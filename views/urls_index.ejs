@@ -27,19 +27,24 @@
             <th scope="col">Action</th> <!-- Added a header for Action -->
           </tr>
         </thead>
-        <tbody>
-          <% for (let id in urls) { %>
-            <tr>
-              <td><%= id %></td>
-              <td><%= urls[id] %></td>
-              <td> <!-- Added a table cell for the form -->
-                <form method="POST" action="/urls/<%= id %>/delete">
-                  <button type="submit">Delete</button>
-                </form>
-              </td>
-            </tr>
-          <% } %>
-        </tbody>
+     <!-- urls_index.ejs -->
+<!-- urls_index.ejs -->
+<tbody>
+  <% for (let id in urls) { %>
+    <tr>
+      <td><%= id %></td>
+      <td><%= urls[id] %></td>
+      <td> <!-- Added a table cell for the buttons -->
+        <a href="/urls/<%= id %>/edit" class="btn btn-primary">Edit</a> <!-- Edit button -->
+        <form method="POST" action="/urls/<%= id %>/delete" style="display: inline;">
+          <button type="submit" class="btn btn-danger">Delete</button> <!-- Delete button -->
+        </form>
+      </td>
+    </tr>
+  <% } %>
+</tbody>
+
+
       </table>
     </main>
     <!-- Bootstrap JS -->
@@ -60,4 +65,3 @@
     ></script>
   </body>
 </html>
-

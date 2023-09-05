@@ -62,3 +62,15 @@ app.post("/urls", (req, res) => {
   console.log("Submitted URL:", submittedURL); // Log the submitted URL
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
+
+
+// Express.js server code
+
+// GET route for displaying the edit page
+app.get("/urls/:id/edit", (req, res) => {
+  const id = req.params.id;
+  const longURL = urlDatabase[id];
+  const templateVars = { id, longURL };
+  res.render("urls_edit", templateVars);
+});
+
