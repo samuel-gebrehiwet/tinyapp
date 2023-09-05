@@ -49,3 +49,16 @@ app.post("/urls", (req, res) => {
   console.log(req.body); // Log the POST request body to the console
   res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
+
+
+//app.get("/u/:id", (req, res) => {
+  // const longURL = ...
+  //res.redirect(longURL);
+//});
+
+
+app.post("/urls", (req, res) => {
+  const submittedURL = req.body.longURL; // Get the submitted URL from the request body
+  console.log("Submitted URL:", submittedURL); // Log the submitted URL
+  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+});
