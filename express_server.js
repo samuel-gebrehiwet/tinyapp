@@ -27,7 +27,6 @@ app.use(
   })
 );
 app.use(morgan("dev"));
-
 app.set("view engine", "ejs");
 
 const urlDatabase = {

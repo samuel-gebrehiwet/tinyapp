@@ -7,7 +7,7 @@
     <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
       <div class="navbar-nav">
           <a class="nav-item nav-link" href="/urls">My URLs</a>
-          <a class="nav-item nav-link" href="/urls/new" <%= typeof user === 'undefined' ? 'hidden' : null%> >Create New URL</a>
+          <a class="nav-item nav-link" href="/urls/new" <%= typeof user === 'undefined' ?'hidden' : null%> >Create New URL</a>
       </div>
       <% if(typeof user !== 'undefined'){ %>
         <form class="d-flex" action="/logout" method="POST">
