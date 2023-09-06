@@ -1,37 +1,25 @@
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-toggle="collapse"
-      data-target="#navbarNavAltMarkup"
-      aria-controls="navbarNavAltMarkup"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNavAltMarkup">
       <div class="navbar-nav">
-        <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-
-        <!-- Check if username cookie exists -->
-        <% if (username) { %>
-          <span class="nav-item nav-link">Logged in as: <%= username %></span>
-          <form method="POST" action="/logout" class="nav-item nav-link">
-            <button type="submit">Logout</button>
-          </form>
-        <% } else { %>
-          <!-- Display login form if no username cookie -->
-          <form method="POST" action="/login" class="nav-item nav-link">
-            <input type="text" name="username" placeholder="Enter your username" />
-            <button type="submit">Login</button>
-          </form>
-        <% } %>
-
+          <a class="nav-item nav-link" href="/urls">My URLs</a>
+          <a class="nav-item nav-link" href="/urls/new" <%= typeof user === 'undefined' ? 'hidden' : null%> >Create New URL</a>
       </div>
+      <% if(typeof user !== 'undefined'){ %>
+        <form class="d-flex" action="/logout" method="POST">
+          <p class="h4 align-self-center" style="margin: 0 !important;">Logged In As: <%= user.email %> </p class="t-5">
+          <button class="btn btn-outline-dark ml-2" type="submit">Logout</button>
+        </form>
+      <% } else { %>
+        <div class="navbar-nav">
+          <a class="nav-item nav-link" href="/register">Register</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
+        </div>
+       <% } %> 
     </div>
   </nav>
 </header>
