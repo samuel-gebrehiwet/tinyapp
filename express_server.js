@@ -30,21 +30,21 @@ app.use(morgan("dev"));
 app.set("view engine", "ejs");
 
 const urlDatabase = {
-  b2xVn2: { userID: 1, longURL: "http://www.lighthouselabs.ca" },
-  "9sm5xK": { userID: 1, longURL: "http://www.google.com" },
-  d34565: { userID: 2, longURL: "http://www.google.com" },
+  b6UTxQ: {
+    longURL: "https://www.tsn.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 const users = {
-  1: {
-    id: "1",
-    email: "a@a.com",
-    password: "$2b$10$2YCZMSaqizp4kc1STwSOvedWrOq36LRrEs/CqEV8ss1cRrAkzQ.ju", // 'pass' is the password before hashed
-  },
-  2: {
-    id: "2",
-    email: "b@b.com",
-    password: "$2b$10$2lLnqqe9isMgb4P6N892hu2.1CV1ZIHfKZh5aQyQscylPjV4bRObu", // 'pass2' is the password before hashed
+  aJ48lW: {
+    id: "aJ48lW",
+    email: "user@example.com",
+    password: "$2b$10$Kb9gG8cE1D4sZ2WgC2M8WufMgjw9Zc18l1J/5w4d3PcMrcr5QPO8A6", // password: "password"
   },
 };
 
@@ -72,10 +72,12 @@ app.get("/urls", (req, res) => {
   // redirect to urls_404 page if not logged in
   if (!users[cookieUserID]) {
     unauthorized(req, res, users, "Please login / Register to have access.");
+    return;
   }
 
   const user = users[cookieUserID];
-  const templateVars = { urls: urlsForUser(cookieUserID, urlDatabase), user };
+  const userURLs = urlsForUser(cookieUserID, urlDatabase);
+  const templateVars = { urls: userURLs, user };
   res.render("urls_index", templateVars);
 });
 
@@ -99,23 +101,25 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const cookieUserID = req.session["user_id"];
 
-  // redirect to urls_404 page if not logged in but the shortURL exist
-  if (!users[cookieUserID] && urlDatabase[shortURL]) {
-    unauthorized(req, res, users);
+  // Check if the user is not logged in
+  if (!cookieUserID) {
+    return res.status(403).send("You must be logged in to access this page.");
   }
 
-  // redirect to urls_404 page if shortURL doesn't exist
+  // Check if the URL does not exist
   if (!urlDatabase[shortURL]) {
-    pageNotFound(req, res, users);
+    return res.status(404).send("Short URL not found.");
   }
 
-  if (isShortURLExist(shortURL, cookieUserID, urlDatabase)) {
-    const longURL = urlDatabase[shortURL].longURL;
-    const user = users[cookieUserID];
-    const templateVars = { shortURL, longURL, user };
-    res.render("urls_show", templateVars);
+  // Check if the URL does not belong to the logged-in user
+  if (urlDatabase[shortURL].userID !== cookieUserID) {
+    return res.status(403).send("You do not have permission to access this URL.");
   }
-  unauthorized(req, res, users);
+
+  const longURL = urlDatabase[shortURL].longURL;
+  const user = users[cookieUserID];
+  const templateVars = { shortURL, longURL, user };
+  res.render("urls_show", templateVars);
 });
 
 // UPDATE URL BY ID
@@ -123,39 +127,41 @@ app.post("/urls/:shortURL", requireLogin, (req, res) => {
   const shortURL = req.params.shortURL;
   const cookieUserID = req.session["user_id"];
 
-  // redirect to urls_404 page if not logged in
-  if (!users[cookieUserID]) {
-    pageNotFound(req, res, users);
+  // Check if the URL does not exist
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("Short URL not found.");
   }
 
-  // checks if user has access to edit
-  if (isShortURLExist(shortURL, cookieUserID, urlDatabase)) {
-    urlDatabase[shortURL].longURL = req.body.newURL;
-    urlDatabase[shortURL].userID = req.session["user_id"];
-    res.redirect("/urls");
-  } else {
-    // check if the user tries to access others' shortURL address
-    unauthorized(req, res, users);
+  // Check if the URL does not belong to the logged-in user
+  if (urlDatabase[shortURL].userID !== cookieUserID) {
+    return res.status(403).send("You do not have permission to edit this URL.");
   }
+
+  // Update the URL here
+  // ...
+
+  res.redirect("/urls");
 });
 
+// DELETE URL BY ID
 app.post("/urls/:shortURL/delete", requireLogin, (req, res) => {
   const shortURL = req.params.shortURL;
   const cookieUserID = req.session["user_id"];
 
-  // redirect to urls_404 page if not logged in
-  if (!users[cookieUserID]) {
-    pageNotFound(req, res, users);
+  // Check if the URL does not exist
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("Short URL not found.");
   }
 
-  // Check if the user owns the URL before deleting it
-  if (isShortURLExist(shortURL, cookieUserID, urlDatabase)) {
-    delete urlDatabase[shortURL];
-    res.redirect("/urls");
-  } else {
-    // Check if an unauthorized person tries to access
-    unauthorized(req, res, users);
+  // Check if the URL does not belong to the logged-in user
+  if (urlDatabase[shortURL].userID !== cookieUserID) {
+    return res.status(403).send("You do not have permission to delete this URL.");
   }
+
+  // Delete the URL here
+  // ...
+
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -194,7 +200,7 @@ app.post("/login", (req, res) => {
   // finding the current object id using the email value
   const id = getUserByEmail(email, users).id;
 
-  // send back encrypted cookie to the client
+  // send back encrypted cookie to client
   req.session["user_id"] = id;
   res.redirect("/urls");
 });
