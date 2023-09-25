@@ -48,6 +48,14 @@ const users = {
   },
 };
 
+// Middleware to check if the user is logged in
+const requireLogin = (req, res, next) => {
+  if (!req.session.user_id) {
+    return res.redirect('/login');
+  }
+  next();
+};
+
 // HOME DIRECTORY
 app.get("/", (req, res) => {
   // if logged in redirect to /urls
@@ -72,25 +80,18 @@ app.get("/urls", (req, res) => {
 });
 
 // NEW FORM TO CREATE SHORT URL
-app.get("/urls/new", (req, res) => {
-  // Accessible only if you logged in!
-  if (isLoggedIn(req.session["user_id"], users)) {
-    const user = users[req.session["user_id"]];
-    const templateVars = { user };
-    return res.render("urls_new", templateVars);
-  }
-  res.redirect("/login");
+app.get("/urls/new", requireLogin, (req, res) => {
+  const user = users[req.session["user_id"]];
+  const templateVars = { user };
+  res.render("urls_new", templateVars);
 });
 
 // CREATE NEW SHORT URL
-app.post("/urls", (req, res) => {
-  if (req.session["user_id"]) {
-    const { longURL } = req.body;
-    const shortURL = generateRandomString();
-    urlDatabase[shortURL] = { userID: req.session["user_id"], longURL };
-    return res.redirect(`/urls/${shortURL}`);
-  }
-  res.redirect("/urls");
+app.post("/urls", requireLogin, (req, res) => {
+  const { longURL } = req.body;
+  const shortURL = generateRandomString();
+  urlDatabase[shortURL] = { userID: req.session["user_id"], longURL };
+  res.redirect(`/urls/${shortURL}`);
 });
 
 // SHOW URL BY ID
@@ -112,13 +113,13 @@ app.get("/urls/:shortURL", (req, res) => {
     const longURL = urlDatabase[shortURL].longURL;
     const user = users[cookieUserID];
     const templateVars = { shortURL, longURL, user };
-    return res.render("urls_show", templateVars);
+    res.render("urls_show", templateVars);
   }
   unauthorized(req, res, users);
 });
 
 // UPDATE URL BY ID
-app.post("/urls/:shortURL", (req, res) => {
+app.post("/urls/:shortURL", requireLogin, (req, res) => {
   const shortURL = req.params.shortURL;
   const cookieUserID = req.session["user_id"];
 
@@ -127,18 +128,18 @@ app.post("/urls/:shortURL", (req, res) => {
     pageNotFound(req, res, users);
   }
 
-  // checks if user have access to edit
+  // checks if user has access to edit
   if (isShortURLExist(shortURL, cookieUserID, urlDatabase)) {
     urlDatabase[shortURL].longURL = req.body.newURL;
     urlDatabase[shortURL].userID = req.session["user_id"];
-    return res.redirect("/urls");
+    res.redirect("/urls");
+  } else {
+    // check if the user tries to access others' shortURL address
+    unauthorized(req, res, users);
   }
-
-  // check if user try to access others shortURL address
-  unauthorized(req, res, users);
 });
 
-app.post("/urls/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", requireLogin, (req, res) => {
   const shortURL = req.params.shortURL;
   const cookieUserID = req.session["user_id"];
 
@@ -147,14 +148,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     pageNotFound(req, res, users);
   }
 
-  // Check if the user own the URL before it deleting
+  // Check if the user owns the URL before deleting it
   if (isShortURLExist(shortURL, cookieUserID, urlDatabase)) {
     delete urlDatabase[shortURL];
-    return res.redirect("/urls");
+    res.redirect("/urls");
+  } else {
+    // Check if an unauthorized person tries to access
+    unauthorized(req, res, users);
   }
-
-  // Check if unauthorized person try to access
-  unauthorized(req, res, users);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -193,7 +194,7 @@ app.post("/login", (req, res) => {
   // finding the current object id using the email value
   const id = getUserByEmail(email, users).id;
 
-  // send back encrypted cookie to client
+  // send back encrypted cookie to the client
   req.session["user_id"] = id;
   res.redirect("/urls");
 });
@@ -234,7 +235,7 @@ app.post("/register", (req, res) => {
     password: hashedPassword,
   };
   users[id] = newUser;
-  // send back encrypted cookie to client
+  // send back encrypted cookie to the client
   req.session["user_id"] = id;
 
   res.redirect("/urls");
