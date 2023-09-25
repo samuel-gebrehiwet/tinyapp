@@ -16,7 +16,7 @@ const {
 } = require("./helpers");
 
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080; // Update with your desired port
 
 app.use(express.urlencoded({ extended: true }));
 // created tinyCookie secure session
@@ -203,16 +203,9 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+// Define a route for the GET request to /register
 app.get("/register", (req, res) => {
-  // if logged in redirect to /urls
-  if (isLoggedIn(req.session["user_id"], users)) {
-    return res.redirect("/urls");
-  }
-
-  const user = users[req.session["user_id"]];
-  const templateVars = { user };
-
-  res.render("urls_register", templateVars);
+  res.render("registration"); // Render the "registration.ejs" template
 });
 
 app.post("/register", (req, res) => {
